@@ -149,30 +149,34 @@ class Market(dict):
 
         ticker = self.blockchain.rpc.get_ticker(self["base"]["id"], self["quote"]["id"])
         data["baseVolume"] = Amount(
-            ticker["base_volume"], self["base"], blockchain_instance=self.blockchain
+            ticker["base_volume"] or 0.0,
+            self["base"],
+            blockchain_instance=self.blockchain,
         )
         data["quoteVolume"] = Amount(
-            ticker["quote_volume"], self["quote"], blockchain_instance=self.blockchain
+            ticker["quote_volume"] or 0.0,
+            self["quote"],
+            blockchain_instance=self.blockchain,
         )
         data["lowestAsk"] = Price(
-            ticker["lowest_ask"],
+            ticker["lowest_ask"] or 0.0,
             base=self["base"],
             quote=self["quote"],
             blockchain_instance=self.blockchain,
         )
         data["highestBid"] = Price(
-            ticker["highest_bid"],
+            ticker["highest_bid"] or 0.0,
             base=self["base"],
             quote=self["quote"],
             blockchain_instance=self.blockchain,
         )
         data["latest"] = Price(
-            ticker["latest"],
+            ticker["latest"] or 0.0,
             quote=self["quote"],
             base=self["base"],
             blockchain_instance=self.blockchain,
         )
-        data["percentChange"] = float(ticker["percent_change"])
+        data["percentChange"] = float(ticker.get("percent_change", 0.0) or 0.0)
 
         return data
 
@@ -475,12 +479,18 @@ class Market(dict):
                 "seller": account["id"],
                 "amount_to_sell": {
                     "amount": int(
-                        round(float(amount) * float(price) * 10 ** self["base"]["precision"])
+                        round(
+                            float(amount)
+                            * float(price)
+                            * 10 ** self["base"]["precision"]
+                        )
                     ),
                     "asset_id": self["base"]["id"],
                 },
                 "min_to_receive": {
-                    "amount": int(round(float(amount) * 10 ** self["quote"]["precision"])),
+                    "amount": int(
+                        round(float(amount) * 10 ** self["quote"]["precision"])
+                    ),
                     "asset_id": self["quote"]["id"],
                 },
                 "expiration": formatTimeFromNow(expiration),
@@ -495,7 +505,7 @@ class Market(dict):
 
         tx = self.blockchain.finalizeOp(order, account["name"], "active", **kwargs)
 
-        if returnOrderId:
+        if returnOrderId and tx.get("operation_results"):
             tx["orderid"] = tx["operation_results"][0][1]
             self.blockchain.blocking = prevblocking
 
@@ -559,12 +569,18 @@ class Market(dict):
                 "fee": {"amount": 0, "asset_id": "1.3.0"},
                 "seller": account["id"],
                 "amount_to_sell": {
-                    "amount": int(round(float(amount) * 10 ** self["quote"]["precision"])),
+                    "amount": int(
+                        round(float(amount) * 10 ** self["quote"]["precision"])
+                    ),
                     "asset_id": self["quote"]["id"],
                 },
                 "min_to_receive": {
                     "amount": int(
-                        round(float(amount) * float(price) * 10 ** self["base"]["precision"])
+                        round(
+                            float(amount)
+                            * float(price)
+                            * 10 ** self["base"]["precision"]
+                        )
                     ),
                     "asset_id": self["base"]["id"],
                 },

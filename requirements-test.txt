@@ -1,11 +1,11 @@
 # Unit testing
-pytest
-pytest-mock
-coverage
-mock
+pytest==4.4.0
+pytest-mock==1.10.3
+coverage==4.5.3
+mock==2.0.0
 
 # Code style
-flake8
+flake8==3.7.7
 # black
-isort
-pre-commit
+isort==4.3.16
+pre-commit==1.15.0

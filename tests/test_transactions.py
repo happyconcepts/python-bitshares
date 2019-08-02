@@ -515,6 +515,27 @@ class Testcases(unittest.TestCase):
         )
         self.doit()
 
+    def test_balance_claim(self):
+        self.op = operations.Balance_claim(
+            **{
+                "fee": {"amount": 0, "asset_id": "1.3.0"},
+                "deposit_to_account": "1.2.121",
+                "balance_to_claim": "1.15.0",
+                "balance_owner_key": "BTS7YFfmNBLpcrhe7hf39NLQfgBjGvtYBtAAc4nDvZKWxVQjF4CeL",
+                "total_claimed": {"amount": 229174, "asset_id": "1.3.0"},
+                "prefix": prefix,
+            }
+        )
+        self.cm = (
+            "f68585abf4dce7c8045701250000000000000000007900035d2"
+            "3de4ecd631e7aae2ec37ace7da12ffceea9fae1722ff4c8fa04"
+            "2ba9ecd3c2367f03000000000000000120056c75aa663a9bc3f"
+            "8d8806c0c32b820d539ee938684b581657a8179769f9f604c3d"
+            "1b4d7dcdc04be31ea28722da45aace8f5b983cc1a5c5a42ca79"
+            "751d4d0fa"
+        )
+        self.doit()
+
     def test_asset_create(self):
         self.op = operations.Asset_create(
             **{
@@ -794,9 +815,9 @@ class Testcases(unittest.TestCase):
                 "issuer": "1.2.123",
                 "asset_to_settle": "1.3.0",
                 "settle_price": {
-                     "base": {"amount": 1123456, "asset_id": "1.3.0"},
-                     "quote": {"amount": 78901122, "asset_id": "1.3.0"},
-                 },
+                    "base": {"amount": 1123456, "asset_id": "1.3.0"},
+                    "quote": {"amount": 78901122, "asset_id": "1.3.0"},
+                },
                 "extensions": [],
             }
         )
@@ -844,16 +865,16 @@ class Testcases(unittest.TestCase):
         )
         self.doit()
 
-
     """
     def test_htlc_create(self):
+        preimage_hash = hexlify(ripemd160(hexlify(b"foobar"))).decode("ascii")
         self.op = operations.Htlc_create(
             **{
                 "fee": {"amount": 0, "asset_id": "1.3.0"},
                 "from": "1.2.123",
                 "to": "1.2.124",
                 "amount": {"amount": 1123456, "asset_id": "1.3.0"},
-                "preimage_hash": [0, ripemd160("foobar")],
+                "preimage_hash": [0, preimage_hash],
                 "preimage_size": 200,
                 "claim_period_seconds": 120,
                 "extensions": [],
@@ -870,11 +891,12 @@ class Testcases(unittest.TestCase):
         self.doit(False)
 
     def test_htlc_redeem(self):
+        preimage = hexlify(b"foobar").decode("ascii")
         self.op = operations.Htlc_redeem(
             **{
                 "fee": {"amount": 0, "asset_id": "1.3.0"},
                 "redeemer": "1.2.124",
-                "preimage": hexlify(b"foobar").decode("ascii"),
+                "preimage": preimage,
                 "htlc_id": "1.16.132",
                 "extensions": [],
             }

@@ -147,7 +147,6 @@ class Order(Price):
 
         if "for_sale" in self:
             self["for_sale"] = Amount(
-                self,
                 {"amount": self["for_sale"], "asset_id": self["base"]["asset"]["id"]},
                 blockchain_instance=self.blockchain,
             )
@@ -238,7 +237,11 @@ class FilledOrder(Price):
         elif isinstance(order, dict):
             # filled orders from account history
             if "op" in order:
-                order = order["op"][1]
+                if isinstance(order["op"], (list, set)):
+                    order = order["op"][1]
+                elif isinstance(order["op"], dict):
+                    order = order["op"]
+
             base_asset = kwargs.get("base_asset", order["receives"]["asset_id"])
             Price.__init__(self, order, base_asset=base_asset)
 
